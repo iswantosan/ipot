@@ -71,7 +71,7 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
 
   void _toggle(CustomizationGroup g, int optId) {
     setState(() {
-      final list = [..._selected[g.id] ?? []];
+      final list = <int>[...?_selected[g.id]];
       if (g.maxSelections == 1) {
         // single-select: replace
         if (g.required) {
