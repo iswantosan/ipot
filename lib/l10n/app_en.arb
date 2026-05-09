@@ -1,0 +1,80 @@
+{
+  "@@locale": "en",
+  "appTitle": "IPOT Order",
+  "scanTitle": "Scan to order",
+  "scanHint": "Point your camera at the QR on the table",
+  "scanInvalid": "QR not recognized — make sure it's from an IPOT table",
+  "scanManualEntry": "Enter table ID manually",
+  "scanEnterTableId": "Enter table ID",
+  "scanTableHint": "e.g. T001",
+  "scanCameraUnavailable": "Camera unavailable",
+  "actionCancel": "Cancel",
+  "actionOpenMenu": "Open menu",
+  "actionRetry": "Retry",
+  "actionAddToCart": "Add to cart",
+  "actionPlaceOrder": "Place order",
+  "actionClear": "Clear",
+  "actionBackToMenu": "Back to menu",
+  "menuTable": "Table {id}",
+  "@menuTable": {
+    "placeholders": {
+      "id": { "type": "String" }
+    }
+  },
+  "menuFailedLoad": "Failed to load menu",
+  "menuSearchHint": "Search menu...",
+  "menuEmptyCategory": "No items in this category",
+  "menuNoMatches": "No matches",
+  "itemNotes": "Notes",
+  "itemNotesHint": "e.g. less spicy, no onion",
+  "itemQuantity": "Quantity",
+  "itemRequired": "Required",
+  "itemMaxSelections": "Max {n}",
+  "@itemMaxSelections": {
+    "placeholders": {
+      "n": { "type": "int" }
+    }
+  },
+  "itemFree": "Free",
+  "itemPickRequired": "Please pick required options first",
+  "cartTitle": "Your cart",
+  "cartClearTitle": "Clear cart?",
+  "cartClearBody": "Remove all items from your cart.",
+  "cartNoteHint": "Note for the kitchen (optional)",
+  "cartSubtotal": "Subtotal ({count} items)",
+  "@cartSubtotal": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "cartEmpty": "Your cart is empty",
+  "cartEmptyHint": "Add some items from the menu",
+  "cartLineNote": "Note: {note}",
+  "@cartLineNote": {
+    "placeholders": {
+      "note": { "type": "String" }
+    }
+  },
+  "orderSubmitting": "Placing your order...",
+  "orderSubmitFailed": "Failed to place order",
+  "orderConfirmedTitle": "Order placed!",
+  "orderConfirmedSubtitle": "Order #{id}",
+  "@orderConfirmedSubtitle": {
+    "placeholders": {
+      "id": { "type": "String" }
+    }
+  },
+  "orderTrackTitle": "Track order",
+  "orderStatusPending": "Pending",
+  "orderStatusConfirmed": "Confirmed",
+  "orderStatusPreparing": "Preparing",
+  "orderStatusReady": "Ready",
+  "orderStatusServed": "Served",
+  "orderEta": "Ready in about {minutes} min",
+  "@orderEta": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "orderBackToScan": "Back to scan"
+}
