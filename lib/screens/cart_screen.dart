@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../api/api_client.dart';
+import '../api/providers.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../models/cart_item.dart';
+import '../models/order.dart';
+import '../navigation/routes.dart';
 import '../state/cart_state.dart';
 import '../utils/formatters.dart';
 import '../widgets/quantity_stepper.dart';
@@ -10,13 +15,83 @@ import '../widgets/quantity_stepper.dart';
 class CartScreen extends ConsumerWidget {
   const CartScreen({super.key});
 
+  Future<void> _placeOrder(BuildContext context, WidgetRef ref) async {
+    final cart = ref.read(cartProvider);
+    final tableId = cart.tableId;
+    if (tableId == null || cart.isEmpty) return;
+
+    final l = AppLocalizations.of(context)!;
+    final api = ref.read(orderApiProvider);
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(l.orderSubmitting),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    try {
+      final req = OrderRequest(
+        tableId: tableId,
+        items: [
+          for (final line in cart.items)
+            OrderItemRequest(
+              menuItemId: line.item.id,
+              quantity: line.quantity,
+              customizations:
+                  line.selections.map((s) => s.toRequestJson()).toList(),
+            ),
+        ],
+        customerNote: cart.note,
+      );
+      final order = await api.createOrder(req);
+
+      ref.read(cartProvider.notifier).clear();
+      if (!context.mounted) return;
+      Navigator.pop(context); // close loading
+      context.go('${AppRoutes.orderStatus}/${order.id}');
+    } on ApiException catch (e) {
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l.orderSubmitFailed}: ${e.message}')),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${l.orderSubmitFailed}: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cart = ref.watch(cartProvider);
+    final l = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Your cart'),
+        title: Text(l.cartTitle),
         actions: [
           if (!cart.isEmpty)
             TextButton(
@@ -24,24 +99,24 @@ class CartScreen extends ConsumerWidget {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text('Clear cart?'),
-                    content: const Text('Remove all items from your cart.'),
+                    title: Text(l.cartClearTitle),
+                    content: Text(l.cartClearBody),
                     actions: [
                       TextButton(
                           onPressed: () => Navigator.pop(ctx),
-                          child: const Text('Cancel')),
+                          child: Text(l.actionCancel)),
                       FilledButton(
                         onPressed: () {
                           ref.read(cartProvider.notifier).clear();
                           Navigator.pop(ctx);
                         },
-                        child: const Text('Clear'),
+                        child: Text(l.actionClear),
                       ),
                     ],
                   ),
                 );
               },
-              child: const Text('Clear'),
+              child: Text(l.actionClear),
             ),
         ],
       ),
@@ -60,18 +135,14 @@ class CartScreen extends ConsumerWidget {
                 ),
                 _NoteField(
                   initial: cart.note,
+                  hint: l.cartNoteHint,
                   onChanged: (v) =>
                       ref.read(cartProvider.notifier).setNote(v.isEmpty ? null : v),
                 ),
                 _SummaryAndCheckout(
                   subtotal: cart.subtotal,
                   itemCount: cart.totalQuantity,
-                  onPlaceOrder: () {
-                    // Wired in session 3 once OrderApi is integrated.
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Order submission — coming next')),
-                    );
-                  },
+                  onPlaceOrder: () => _placeOrder(context, ref),
                 ),
               ],
             ),
@@ -154,8 +225,9 @@ class _CartLine extends ConsumerWidget {
 }
 
 class _NoteField extends StatefulWidget {
-  const _NoteField({required this.initial, required this.onChanged});
+  const _NoteField({required this.initial, required this.hint, required this.onChanged});
   final String? initial;
+  final String hint;
   final ValueChanged<String> onChanged;
 
   @override
@@ -185,7 +257,7 @@ class _NoteFieldState extends State<_NoteField> {
         controller: _ctrl,
         onChanged: widget.onChanged,
         decoration: InputDecoration(
-          hintText: 'Note for the kitchen (optional)',
+          hintText: widget.hint,
           prefixIcon: const Icon(Icons.edit_note),
           filled: true,
           fillColor: Colors.grey.shade100,
@@ -212,6 +284,7 @@ class _SummaryAndCheckout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     return SafeArea(
       top: false,
       child: Container(
@@ -225,7 +298,7 @@ class _SummaryAndCheckout extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Subtotal ($itemCount items)', style: theme.textTheme.bodyMedium),
+                Text(l.cartSubtotal(itemCount), style: theme.textTheme.bodyMedium),
                 Text(
                   formatPrice(subtotal),
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
@@ -238,7 +311,7 @@ class _SummaryAndCheckout extends StatelessWidget {
               height: 52,
               child: FilledButton(
                 onPressed: onPlaceOrder,
-                child: const Text('Place order'),
+                child: Text(l.actionPlaceOrder),
               ),
             ),
           ],
@@ -254,6 +327,7 @@ class _EmptyCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -262,11 +336,11 @@ class _EmptyCart extends StatelessWidget {
           children: [
             const Icon(Icons.shopping_bag_outlined, size: 96, color: Colors.grey),
             const SizedBox(height: 16),
-            Text('Your cart is empty', style: Theme.of(context).textTheme.titleMedium),
+            Text(l.cartEmpty, style: Theme.of(context).textTheme.titleMedium),
             const SizedBox(height: 8),
-            const Text('Add some items from the menu', style: TextStyle(color: Colors.grey)),
+            Text(l.cartEmptyHint, style: const TextStyle(color: Colors.grey)),
             const SizedBox(height: 24),
-            FilledButton(onPressed: onBrowse, child: const Text('Back to menu')),
+            FilledButton(onPressed: onBrowse, child: Text(l.actionBackToMenu)),
           ],
         ),
       ),

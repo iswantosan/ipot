@@ -4,6 +4,7 @@ import '../models/menu_item.dart';
 import '../screens/cart_screen.dart';
 import '../screens/item_detail_screen.dart';
 import '../screens/menu_screen.dart';
+import '../screens/order_status_screen.dart';
 import '../screens/scan_screen.dart';
 import 'routes.dart';
 
@@ -33,6 +34,12 @@ GoRouter buildRouter() {
         path: AppRoutes.cart,
         name: 'cart',
         builder: (context, state) => const CartScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.orderStatus}/:id',
+        name: 'orderStatus',
+        builder: (context, state) =>
+            OrderStatusScreen(orderId: state.pathParameters['id']!),
       ),
     ],
   );
