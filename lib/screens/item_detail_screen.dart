@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import '../models/cart_item.dart';
 import '../models/customization.dart';
 import '../models/menu_item.dart';
@@ -102,9 +103,10 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
   }
 
   void _addToCart() {
+    final l = AppLocalizations.of(context)!;
     if (!_isValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please pick required options first')),
+        SnackBar(content: Text(l.itemPickRequired)),
       );
       return;
     }
@@ -129,6 +131,7 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
   Widget build(BuildContext context) {
     final item = widget.item;
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     final lineTotal = _unitPrice * _quantity;
 
     return Scaffold(
@@ -172,12 +175,12 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Notes', style: theme.textTheme.titleMedium),
+                Text(l.itemNotes, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _noteCtrl,
                   decoration: InputDecoration(
-                    hintText: 'e.g. less spicy, no onion',
+                    hintText: l.itemNotesHint,
                     filled: true,
                     fillColor: Colors.grey.shade100,
                     border: OutlineInputBorder(
@@ -196,7 +199,7 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Quantity', style: theme.textTheme.titleMedium),
+                Text(l.itemQuantity, style: theme.textTheme.titleMedium),
                 QuantityStepper(
                   value: _quantity,
                   onChanged: (v) => setState(() => _quantity = v),
@@ -216,7 +219,7 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Add to cart'),
+                  Text(l.actionAddToCart),
                   const SizedBox(width: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -253,6 +256,7 @@ class _GroupSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = AppLocalizations.of(context)!;
     final isMulti = group.maxSelections > 1;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -271,7 +275,7 @@ class _GroupSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    'Required',
+                    l.itemRequired,
                     style: TextStyle(
                       color: theme.colorScheme.primary,
                       fontSize: 11,
@@ -282,7 +286,7 @@ class _GroupSection extends StatelessWidget {
               const Spacer(),
               if (isMulti)
                 Text(
-                  'Max ${group.maxSelections}',
+                  l.itemMaxSelections(group.maxSelections),
                   style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
                 ),
             ],

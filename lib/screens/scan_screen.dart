@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import '../navigation/routes.dart';
 import '../state/cart_state.dart';
 import '../state/session_state.dart';
@@ -40,7 +41,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       }
     }
     setState(() {
-      _error = 'QR ga dikenali — pastikan dari meja IPOT';
+      _error = AppLocalizations.of(context)!.scanInvalid;
     });
   }
 
@@ -53,22 +54,23 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
   }
 
   Future<void> _manualEntry() async {
+    final l = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: 'T001');
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Enter table ID'),
+        title: Text(l.scanEnterTableId),
         content: TextField(
           controller: controller,
           autofocus: true,
-          decoration: const InputDecoration(hintText: 'e.g. T001'),
+          decoration: InputDecoration(hintText: l.scanTableHint),
           textCapitalization: TextCapitalization.characters,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l.actionCancel)),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, controller.text.trim()),
-            child: const Text('Open menu'),
+            child: Text(l.actionOpenMenu),
           ),
         ],
       ),
@@ -78,18 +80,17 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Scan to order'),
+        title: Text(l.scanTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.flash_on),
-            tooltip: 'Toggle torch',
             onPressed: () => _controller.toggleTorch(),
           ),
           IconButton(
             icon: const Icon(Icons.cameraswitch),
-            tooltip: 'Switch camera',
             onPressed: () => _controller.switchCamera(),
           ),
         ],
@@ -104,7 +105,6 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
               onManual: _manualEntry,
             ),
           ),
-          // Cutout overlay
           Center(
             child: Container(
               width: 240,
@@ -143,18 +143,18 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                       color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      'Point your camera at the QR on the table',
-                      style: TextStyle(color: Colors.white),
+                    child: Text(
+                      l.scanHint,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextButton.icon(
                     onPressed: _manualEntry,
                     icon: const Icon(Icons.keyboard, color: Colors.white),
-                    label: const Text(
-                      'Enter table ID manually',
-                      style: TextStyle(color: Colors.white),
+                    label: Text(
+                      l.scanManualEntry,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
@@ -174,6 +174,7 @@ class _PermissionFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -181,14 +182,14 @@ class _PermissionFallback extends StatelessWidget {
         children: [
           const Icon(Icons.camera_alt_outlined, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
-          Text('Camera unavailable', style: Theme.of(context).textTheme.titleMedium),
+          Text(l.scanCameraUnavailable, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(error, textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: onManual,
             icon: const Icon(Icons.keyboard),
-            label: const Text('Enter table ID'),
+            label: Text(l.scanEnterTableId),
           ),
         ],
       ),

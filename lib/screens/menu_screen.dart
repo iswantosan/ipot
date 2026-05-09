@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../l10n/generated/app_localizations.dart';
 import '../models/menu.dart';
 import '../models/menu_item.dart';
 import '../navigation/routes.dart';
@@ -42,29 +43,32 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
     final menuAsync = ref.watch(menuProvider(tableId));
     return menuAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (err, _) => Scaffold(
-        appBar: AppBar(title: const Text('Menu')),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
-                const SizedBox(height: 16),
-                Text('Failed to load menu', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 8),
-                Text('$err', textAlign: TextAlign.center),
-                const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: () => ref.invalidate(menuProvider(tableId)),
-                  child: const Text('Retry'),
-                ),
-              ],
+      error: (err, _) {
+        final l = AppLocalizations.of(context)!;
+        return Scaffold(
+          appBar: AppBar(),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 64, color: Colors.redAccent),
+                  const SizedBox(height: 16),
+                  Text(l.menuFailedLoad, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 8),
+                  Text('$err', textAlign: TextAlign.center),
+                  const SizedBox(height: 24),
+                  FilledButton(
+                    onPressed: () => ref.invalidate(menuProvider(tableId)),
+                    child: Text(l.actionRetry),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
       data: (menu) => _MenuView(
         menu: menu,
         query: _query,
@@ -99,6 +103,7 @@ class _MenuView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cart = ref.watch(cartProvider);
+    final l = AppLocalizations.of(context)!;
     final searching = query.trim().isNotEmpty;
 
     return DefaultTabController(
@@ -110,7 +115,7 @@ class _MenuView extends ConsumerWidget {
             children: [
               Text(menu.restaurant.name, style: const TextStyle(fontSize: 18)),
               Text(
-                'Table ${menu.restaurant.tableId}',
+                l.menuTable(menu.restaurant.tableId),
                 style: const TextStyle(fontSize: 12, color: Colors.black54),
               ),
             ],
@@ -131,7 +136,7 @@ class _MenuView extends ConsumerWidget {
                 onChanged: onQueryChanged,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
-                  hintText: 'Search menu...',
+                  hintText: l.menuSearchHint,
                   filled: true,
                   fillColor: Colors.grey.shade100,
                   contentPadding: const EdgeInsets.symmetric(vertical: 0),
@@ -185,7 +190,7 @@ class _CategoryItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(child: Text('No items in this category'));
+      return Center(child: Text(AppLocalizations.of(context)!.menuEmptyCategory));
     }
     return ListView.separated(
       itemCount: items.length,
@@ -210,7 +215,7 @@ class _SearchResults extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return const Center(child: Text('No matches'));
+      return Center(child: Text(AppLocalizations.of(context)!.menuNoMatches));
     }
     return ListView.separated(
       itemCount: items.length,
