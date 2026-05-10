@@ -100,6 +100,11 @@ class _MenuView extends ConsumerWidget {
         .toList();
   }
 
+  Future<void> _refresh(WidgetRef ref) async {
+    ref.invalidate(menuProvider(menu.restaurant.tableId));
+    await ref.read(menuProvider(menu.restaurant.tableId).future);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cart = ref.watch(cartProvider);
@@ -158,13 +163,16 @@ class _MenuView extends ConsumerWidget {
             ),
             Expanded(
               child: searching
-                  ? _SearchResults(items: _filter(menu.items), menu: menu)
+                  ? _SearchResults(
+                      items: _filter(menu.items),
+                      onRefresh: () => _refresh(ref),
+                    )
                   : TabBarView(
                       children: [
                         for (final c in menu.categories)
                           _CategoryItems(
                             items: menu.itemsForCategory(c.id),
-                            menu: menu,
+                            onRefresh: () => _refresh(ref),
                           ),
                       ],
                     ),
@@ -182,51 +190,71 @@ class _MenuView extends ConsumerWidget {
 }
 
 class _CategoryItems extends StatelessWidget {
-  const _CategoryItems({required this.items, required this.menu});
+  const _CategoryItems({required this.items, required this.onRefresh});
 
   final List<MenuItem> items;
-  final Menu menu;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.menuEmptyCategory));
-    }
-    return ListView.separated(
-      itemCount: items.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: Colors.grey.shade200),
-      itemBuilder: (ctx, i) {
-        final item = items[i];
-        return MenuItemCard(
-          item: item,
-          onTap: () => context.push(AppRoutes.itemDetail, extra: item),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: items.isEmpty
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: 200.0),
+                Center(child: Text(AppLocalizations.of(context)!.menuEmptyCategory)),
+              ],
+            )
+          : ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: items.length,
+              separatorBuilder: (_, _) =>
+                  Divider(height: 1, color: Colors.grey.shade200),
+              itemBuilder: (ctx, i) {
+                final item = items[i];
+                return MenuItemCard(
+                  item: item,
+                  onTap: () => context.push(AppRoutes.itemDetail, extra: item),
+                );
+              },
+            ),
     );
   }
 }
 
 class _SearchResults extends StatelessWidget {
-  const _SearchResults({required this.items, required this.menu});
+  const _SearchResults({required this.items, required this.onRefresh});
 
   final List<MenuItem> items;
-  final Menu menu;
+  final Future<void> Function() onRefresh;
 
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty) {
-      return Center(child: Text(AppLocalizations.of(context)!.menuNoMatches));
-    }
-    return ListView.separated(
-      itemCount: items.length,
-      separatorBuilder: (_, _) => Divider(height: 1, color: Colors.grey.shade200),
-      itemBuilder: (ctx, i) {
-        final item = items[i];
-        return MenuItemCard(
-          item: item,
-          onTap: () => context.push(AppRoutes.itemDetail, extra: item),
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: onRefresh,
+      child: items.isEmpty
+          ? ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              children: [
+                SizedBox(height: 200.0),
+                Center(child: Text(AppLocalizations.of(context)!.menuNoMatches)),
+              ],
+            )
+          : ListView.separated(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: items.length,
+              separatorBuilder: (_, _) =>
+                  Divider(height: 1, color: Colors.grey.shade200),
+              itemBuilder: (ctx, i) {
+                final item = items[i];
+                return MenuItemCard(
+                  item: item,
+                  onTap: () => context.push(AppRoutes.itemDetail, extra: item),
+                );
+              },
+            ),
     );
   }
 }
