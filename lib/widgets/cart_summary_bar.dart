@@ -38,14 +38,24 @@ class CartSummaryBar extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 14,
-                        child: Text(
-                          '$itemCount',
-                          style: TextStyle(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.bold,
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 220),
+                        transitionBuilder: (child, anim) => ScaleTransition(
+                          scale: Tween<double>(begin: 1.3, end: 1.0).animate(
+                            CurvedAnimation(parent: anim, curve: Curves.easeOutBack),
+                          ),
+                          child: child,
+                        ),
+                        child: CircleAvatar(
+                          key: ValueKey<int>(itemCount),
+                          backgroundColor: Colors.white,
+                          radius: 14,
+                          child: Text(
+                            '$itemCount',
+                            style: TextStyle(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
