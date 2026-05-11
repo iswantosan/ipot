@@ -138,74 +138,121 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
     return Scaffold(
       appBar: AppBar(title: Text(item.name)),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: 100),
+        padding: const EdgeInsets.only(bottom: 110),
         children: [
-          if (item.imageUrl != null)
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Image.network(item.imageUrl!, fit: BoxFit.cover),
-            ),
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: item.imageUrl != null
+                ? Image.network(item.imageUrl!, fit: BoxFit.cover)
+                : Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          theme.colorScheme.primary.withValues(alpha: 0.20),
+                          theme.colorScheme.primary.withValues(alpha: 0.06),
+                        ],
+                      ),
+                    ),
+                    child: Icon(Icons.restaurant_rounded,
+                        size: 84,
+                        color: theme.colorScheme.primary.withValues(alpha: 0.55)),
+                  ),
+          ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.name, style: theme.textTheme.headlineSmall),
-                const SizedBox(height: 4),
                 Text(
-                  formatPrice(item.price),
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.w600,
+                  item.name,
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    formatPrice(item.price),
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14.sp,
+                    ),
                   ),
                 ),
                 if (item.description.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Text(item.description, style: theme.textTheme.bodyMedium),
+                  const SizedBox(height: 10),
+                  Text(
+                    item.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.black54,
+                      height: 1.4,
+                    ),
+                  ),
                 ],
               ],
             ),
           ),
-          for (final group in item.customizationGroups) _GroupSection(
-            group: group,
-            selected: _selected[group.id] ?? const [],
-            onToggle: (optId) => _toggle(group, optId),
-          ),
+          for (final group in item.customizationGroups)
+            _GroupSection(
+              group: group,
+              selected: _selected[group.id] ?? const [],
+              onToggle: (optId) => _toggle(group, optId),
+            ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l.itemNotes, style: theme.textTheme.titleMedium),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _noteCtrl,
-                  decoration: InputDecoration(
-                    hintText: l.itemNotesHint,
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: _Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l.itemNotes,
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
                   ),
-                  maxLines: 2,
-                ),
-              ],
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: _noteCtrl,
+                    decoration: InputDecoration(
+                      hintText: l.itemNotesHint,
+                      hintStyle: const TextStyle(color: Colors.black38),
+                      filled: true,
+                      fillColor: const Color(0xFFF6F6F6),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l.itemQuantity, style: theme.textTheme.titleMedium),
-                QuantityStepper(
-                  value: _quantity,
-                  onChanged: (v) => setState(() => _quantity = v),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+            child: _Card(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l.itemQuantity,
+                    style: theme.textTheme.titleMedium
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                  QuantityStepper(
+                    value: _quantity,
+                    onChanged: (v) => setState(() => _quantity = v),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -243,6 +290,31 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
   }
 }
 
+class _Card extends StatelessWidget {
+  const _Card({required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
 class _GroupSection extends StatelessWidget {
   const _GroupSection({
     required this.group,
@@ -261,47 +333,54 @@ class _GroupSection extends StatelessWidget {
     final isMulti = group.maxSelections > 1;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(group.name, style: theme.textTheme.titleMedium),
-              const SizedBox(width: 8),
-              if (group.required)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    l.itemRequired,
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+      child: _Card(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  group.name,
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(width: 8),
+                if (group.required)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      l.itemRequired,
+                      style: TextStyle(
+                        color: theme.colorScheme.primary,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
-                ),
-              const Spacer(),
-              if (isMulti)
-                Text(
-                  l.itemMaxSelections(group.maxSelections),
-                  style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
-                ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          for (final opt in group.options)
-            _OptionTile(
-              label: opt.name,
-              priceModifier: opt.priceModifier,
-              selected: selected.contains(opt.id),
-              isMulti: isMulti,
-              onTap: () => onToggle(opt.id),
+                const Spacer(),
+                if (isMulti)
+                  Text(
+                    l.itemMaxSelections(group.maxSelections),
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: Colors.black54),
+                  ),
+              ],
             ),
-        ],
+            const SizedBox(height: 6),
+            for (final opt in group.options)
+              _OptionTile(
+                label: opt.name,
+                priceModifier: opt.priceModifier,
+                selected: selected.contains(opt.id),
+                isMulti: isMulti,
+                onTap: () => onToggle(opt.id),
+              ),
+          ],
+        ),
       ),
     );
   }
