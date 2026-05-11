@@ -17,7 +17,8 @@ Built with Flutter (Dart) for Android & iOS.
 
 **Polish & bonus**
 
-- **i18n** with English + Indonesian (Bahasa) via Flutter `gen-l10n` + ARB files
+- **i18n** with English, Indonesian and Simplified Chinese via Flutter `gen-l10n` + ARB files
+- **Offline-friendly menu** — when the live API is unreachable, the last successful fetch is read back from disk (see `MenuCache`)
 - **Mock-first API layer** so the whole flow runs without a live backend
 - **Responsive sizing** with `flutter_screenutil` (design size 375 × 812)
 - **Typography** via Google Fonts (Plus Jakarta Sans)
@@ -67,7 +68,7 @@ Or tap **Enter table ID manually** on the scan screen (useful on emulators with 
 
 ### Locale
 
-The app respects the device locale. `en` and `id` are bundled. Test the Indonesian copy by setting your device language to **Bahasa Indonesia**.
+The app respects the device locale. `en`, `id` and `zh` are bundled. Test by switching device language between **English**, **Bahasa Indonesia** and **简体中文**.
 
 ## Project layout
 
@@ -95,6 +96,7 @@ test/            # Unit + widget tests
 - **Mock vs live API** is a single env-driven switch (`USE_MOCK`). The app picks `MockMenuApi` / `MockOrderApi` or the dio-backed implementations at provider construction — no code change needed to flip.
 - **Cart line de-dup**: items added with the same customization set merge into one line and bump quantity; different selections stay as separate lines (e.g. one Mild Ramen + one Extra Spicy Ramen). See `CartController._lineKey`.
 - **Order tracking** uses an `autoDispose` `StreamProvider.family` that polls the order endpoint every 4 s until the status reaches `served`, then closes itself.
+- **Offline menu cache**: when running against the live API, `HttpMenuApi` writes the raw JSON to the app's documents directory after a successful fetch. On the next failed request the cached payload is parsed back into `Menu`, so customers still see the menu when the network drops. Mock mode does not use the cache because the bundled JSON is always available.
 - **QR payload** format: `ipot://table/{tableId}`. The parser tolerates `https://.../table/{id}` form too (see `lib/utils/qr.dart`).
 - **Mock order progression**: `MockOrderApi` advances the status one step every ~6 s of wall time so the tracking UI can be demoed end-to-end without a backend.
 
