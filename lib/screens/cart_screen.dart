@@ -126,11 +126,9 @@ class CartScreen extends ConsumerWidget {
           : Column(
               children: [
                 Expanded(
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(0, 12, 0, 8),
                     itemCount: cart.items.length,
-                    separatorBuilder: (_, _) =>
-                        Divider(height: 1, color: Colors.grey.shade200),
                     itemBuilder: (ctx, i) => _CartLine(line: cart.items[i]),
                   ),
                 ),
@@ -160,66 +158,121 @@ class _CartLine extends ConsumerWidget {
     final theme = Theme.of(context);
     final ctrl = ref.read(cartProvider.notifier);
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(line.item.name, style: theme.textTheme.titleMedium),
-                    if (line.selections.isNotEmpty) ...[
-                      const SizedBox(height: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        line.selections.map((s) => s.option.name).join(', '),
-                        style: theme.textTheme.bodySmall?.copyWith(color: Colors.black54),
+                        line.item.name,
+                        style: theme.textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
                       ),
-                    ],
-                    if (line.note != null && line.note!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        'Note: ${line.note}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: Colors.black54,
-                          fontStyle: FontStyle.italic,
+                      if (line.selections.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            for (final s in line.selections)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF2F2F2),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  s.option.name,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.black54,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
+                      ],
+                      if (line.note != null && line.note!.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Row(
+                          children: [
+                            const Icon(Icons.sticky_note_2_outlined,
+                                size: 14, color: Colors.black45),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                line.note!,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: Colors.black54,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline),
-                color: Colors.grey.shade600,
-                onPressed: () => ctrl.remove(line.lineId),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              QuantityStepper(
-                value: line.quantity,
-                onChanged: (v) {
-                  if (v > line.quantity) {
-                    ctrl.increment(line.lineId);
-                  } else {
-                    ctrl.decrement(line.lineId);
-                  }
-                },
-              ),
-              Text(
-                formatPrice(line.lineTotal),
-                style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-              ),
-            ],
-          ),
-        ],
+                InkWell(
+                  onTap: () => ctrl.remove(line.lineId),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(Icons.delete_outline_rounded,
+                        color: Colors.grey.shade500, size: 20),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                QuantityStepper(
+                  value: line.quantity,
+                  onChanged: (v) {
+                    if (v > line.quantity) {
+                      ctrl.increment(line.lineId);
+                    } else {
+                      ctrl.decrement(line.lineId);
+                    }
+                  },
+                ),
+                Text(
+                  formatPrice(line.lineTotal),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -289,30 +342,47 @@ class _SummaryAndCheckout extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 8)],
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
         ),
         child: Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(l.cartSubtotal(itemCount), style: theme.textTheme.bodyMedium),
+                Text(
+                  l.cartSubtotal(itemCount),
+                  style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
+                ),
                 Text(
                   formatPrice(subtotal),
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             SizedBox(
               width: double.infinity,
-              height: 52.h,
-              child: FilledButton(
+              height: 54.h,
+              child: FilledButton.icon(
                 onPressed: onPlaceOrder,
-                child: Text(l.actionPlaceOrder),
+                icon: const Icon(Icons.check_rounded),
+                label: Text(
+                  l.actionPlaceOrder,
+                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                ),
               ),
             ),
           ],
