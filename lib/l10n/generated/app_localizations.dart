@@ -146,6 +146,54 @@ abstract class AppLocalizations {
   /// **'Camera unavailable'**
   String get scanCameraUnavailable;
 
+  /// No description provided for @scanTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Order from your table, in seconds'**
+  String get scanTagline;
+
+  /// No description provided for @permissionCameraTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access needed'**
+  String get permissionCameraTitle;
+
+  /// No description provided for @permissionCameraBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We use the camera to scan the QR code on your table. Your camera feed stays on this device.'**
+  String get permissionCameraBody;
+
+  /// No description provided for @permissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow camera'**
+  String get permissionAllow;
+
+  /// No description provided for @permissionNotNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get permissionNotNow;
+
+  /// No description provided for @permissionDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera permission denied'**
+  String get permissionDeniedTitle;
+
+  /// No description provided for @permissionDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can grant camera access in system settings, or enter your table ID manually.'**
+  String get permissionDeniedBody;
+
+  /// No description provided for @permissionOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get permissionOpenSettings;
+
   /// No description provided for @actionCancel.
   ///
   /// In en, this message translates to:

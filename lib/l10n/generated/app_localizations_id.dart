@@ -33,6 +33,32 @@ class AppLocalizationsId extends AppLocalizations {
   String get scanCameraUnavailable => 'Kamera tidak tersedia';
 
   @override
+  String get scanTagline => 'Pesan dari meja kamu, cepet banget';
+
+  @override
+  String get permissionCameraTitle => 'Butuh akses kamera';
+
+  @override
+  String get permissionCameraBody =>
+      'Kami pakai kamera buat scan QR di meja kamu. Gambar kamera ga keluar dari device ini.';
+
+  @override
+  String get permissionAllow => 'Izinkan kamera';
+
+  @override
+  String get permissionNotNow => 'Nanti aja';
+
+  @override
+  String get permissionDeniedTitle => 'Akses kamera ditolak';
+
+  @override
+  String get permissionDeniedBody =>
+      'Kamu bisa kasih izin kamera lewat pengaturan sistem, atau masukin ID meja secara manual.';
+
+  @override
+  String get permissionOpenSettings => 'Buka pengaturan';
+
+  @override
   String get actionCancel => 'Batal';
 
   @override

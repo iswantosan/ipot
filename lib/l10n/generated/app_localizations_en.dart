@@ -34,6 +34,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scanCameraUnavailable => 'Camera unavailable';
 
   @override
+  String get scanTagline => 'Order from your table, in seconds';
+
+  @override
+  String get permissionCameraTitle => 'Camera access needed';
+
+  @override
+  String get permissionCameraBody =>
+      'We use the camera to scan the QR code on your table. Your camera feed stays on this device.';
+
+  @override
+  String get permissionAllow => 'Allow camera';
+
+  @override
+  String get permissionNotNow => 'Not now';
+
+  @override
+  String get permissionDeniedTitle => 'Camera permission denied';
+
+  @override
+  String get permissionDeniedBody =>
+      'You can grant camera access in system settings, or enter your table ID manually.';
+
+  @override
+  String get permissionOpenSettings => 'Open settings';
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override
