@@ -69,56 +69,119 @@ class _StatusView extends StatelessWidget {
       }
     }
 
+    final isDone = order.status == OrderStatus.served;
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
-              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  theme.colorScheme.primary,
+                  const Color(0xFFB1352C),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.25),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.receipt_long, color: theme.colorScheme.primary),
-                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.20),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        isDone ? Icons.celebration_rounded : Icons.receipt_long_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
                     Text(
                       l.orderConfirmedSubtitle(order.id),
-                      style: theme.textTheme.titleMedium,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(label(order.status), style: theme.textTheme.headlineSmall),
-                if (order.estimatedMinutes != null &&
-                    order.status != OrderStatus.served) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    l.orderEta(order.estimatedMinutes!),
-                    style: theme.textTheme.bodyMedium,
+                const SizedBox(height: 16),
+                Text(
+                  label(order.status),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    height: 1.1,
+                  ),
+                ),
+                if (order.estimatedMinutes != null && !isDone) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(Icons.schedule_rounded,
+                          color: Colors.white70, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        l.orderEta(order.estimatedMinutes!),
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
                   ),
                 ],
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          for (var i = 0; i < steps.length; i++)
-            _StepRow(
-              label: label(steps[i]),
-              done: i < currentIdx,
-              active: i == currentIdx,
-              isLast: i == steps.length - 1,
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.04)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-          const SizedBox(height: 32),
+            child: Column(
+              children: [
+                for (var i = 0; i < steps.length; i++)
+                  _StepRow(
+                    label: label(steps[i]),
+                    done: i < currentIdx,
+                    active: i == currentIdx,
+                    isLast: i == steps.length - 1,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
           Center(
             child: TextButton.icon(
               onPressed: () => context.go(AppRoutes.scan),
-              icon: const Icon(Icons.qr_code_scanner),
+              icon: const Icon(Icons.qr_code_scanner_rounded),
               label: Text(l.orderBackToScan),
             ),
           ),
@@ -153,15 +216,15 @@ class _StepRow extends StatelessWidget {
           Column(
             children: [
               Container(
-                width: 24,
-                height: 24,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
                 child: done
-                    ? const Icon(Icons.check, color: Colors.white, size: 16)
+                    ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
                     : (active
-                        ? const Padding(
-                            padding: EdgeInsets.all(6),
-                            child: CircleAvatar(backgroundColor: Colors.white),
+                        ? Padding(
+                            padding: const EdgeInsets.all(7),
+                            child: _PulsingDot(color: Colors.white),
                           )
                         : null),
               ),
@@ -171,17 +234,61 @@ class _StepRow extends StatelessWidget {
           ),
           const SizedBox(width: 16),
           Padding(
-            padding: const EdgeInsets.only(top: 2, bottom: 16),
+            padding: const EdgeInsets.only(top: 4, bottom: 18),
             child: Text(
               label,
               style: TextStyle(
                 fontSize: 16,
-                fontWeight: active ? FontWeight.w700 : FontWeight.w400,
-                color: done || active ? Colors.black : Colors.black54,
+                fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                color: done || active ? Colors.black87 : Colors.black45,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PulsingDot extends StatefulWidget {
+  const _PulsingDot({required this.color});
+  final Color color;
+
+  @override
+  State<_PulsingDot> createState() => _PulsingDotState();
+}
+
+class _PulsingDotState extends State<_PulsingDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, _) => Opacity(
+        opacity: 0.55 + (_ctrl.value * 0.45),
+        child: Container(
+          decoration: BoxDecoration(
+            color: widget.color,
+            shape: BoxShape.circle,
+          ),
+        ),
       ),
     );
   }
