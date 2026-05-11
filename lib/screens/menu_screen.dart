@@ -11,6 +11,7 @@ import '../state/menu_state.dart';
 import '../state/session_state.dart';
 import '../widgets/cart_summary_bar.dart';
 import '../widgets/menu_item_card.dart';
+import '../widgets/menu_shimmer.dart';
 
 class MenuScreen extends ConsumerStatefulWidget {
   const MenuScreen({super.key});
@@ -42,7 +43,7 @@ class _MenuScreenState extends ConsumerState<MenuScreen> {
 
     final menuAsync = ref.watch(menuProvider(tableId));
     return menuAsync.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      loading: () => const MenuShimmer(),
       error: (err, _) {
         final l = AppLocalizations.of(context)!;
         return Scaffold(
