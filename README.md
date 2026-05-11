@@ -4,6 +4,14 @@ Customer-side QR ordering app for IPOT. Scan the QR on a table → browse the me
 
 Built with Flutter (Dart) for Android & iOS.
 
+## Download
+
+📦 **[Download APK (Android, ~66 MB)](https://drive.google.com/file/d/1gBjA30eUqu1RiMY4EBxkeZKu2OrBsnvY/view?usp=sharing)**
+
+The APK ships with the mock API switched on, so the full flow works without a backend. On the scan screen, either point the camera at a QR encoding `ipot://table/T001` or tap **Enter table ID manually**.
+
+> APK is debug-signed for review purposes — install via `adb install` or enable *Install from unknown sources* on the device.
+
 ## Features
 
 **Core flow**
