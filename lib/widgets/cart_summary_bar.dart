@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../utils/formatters.dart';
 
@@ -63,19 +64,19 @@ class CartSummaryBar extends StatelessWidget {
                       Expanded(
                         child: Text(
                           label,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                           ),
                         ),
                       ),
                       Text(
                         formatPrice(subtotal),
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                         ),
                       ),
                       const SizedBox(width: 4),

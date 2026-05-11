@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class QuantityStepper extends StatelessWidget {
   const QuantityStepper({
@@ -36,11 +37,11 @@ class QuantityStepper extends StatelessWidget {
             padding: EdgeInsets.zero,
           ),
           SizedBox(
-            width: 28,
+            width: 28.w,
             child: Text(
               '$value',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.sp),
             ),
           ),
           IconButton(

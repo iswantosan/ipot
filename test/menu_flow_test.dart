@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ipot/api/menu_api.dart';
@@ -47,17 +48,20 @@ class _StubMenuApi implements MenuApi {
 }
 
 Widget _harness({required ProviderContainer container}) {
-  return UncontrolledProviderScope(
-    container: container,
-    child: MaterialApp(
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('en')],
-      home: const MenuScreen(),
+  return ScreenUtilInit(
+    designSize: const Size(375, 812),
+    builder: (context, child) => UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en')],
+        home: const MenuScreen(),
+      ),
     ),
   );
 }

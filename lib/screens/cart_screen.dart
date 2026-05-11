@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../api/api_client.dart';
@@ -308,7 +309,7 @@ class _SummaryAndCheckout extends StatelessWidget {
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
-              height: 52,
+              height: 52.h,
               child: FilledButton(
                 onPressed: onPlaceOrder,
                 child: Text(l.actionPlaceOrder),

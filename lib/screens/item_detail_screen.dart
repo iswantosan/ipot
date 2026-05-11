@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
 import '../l10n/generated/app_localizations.dart';
@@ -213,7 +214,7 @@ class _ItemDetailScreenState extends ConsumerState<ItemDetailScreen> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: SizedBox(
-            height: 52,
+            height: 52.h,
             child: FilledButton(
               onPressed: _isValid ? _addToCart : null,
               child: Row(
